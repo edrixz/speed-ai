@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ArrowLeft, Zap, AlertCircle, CheckCircle2 } from "lucide-vue-next";
+import {
+  ArrowLeft,
+  Zap,
+  AlertCircle,
+  CheckCircle2,
+  Trash2,
+  PlusCircle,
+} from "lucide-vue-next";
 
 // Sử dụng Composable
 const {
@@ -69,6 +76,38 @@ const schemaProperties = computed(() => {
                   {{ opt }}
                 </option>
               </select>
+            </div>
+
+            <div v-else-if="config.type === 'array'" class="space-y-2">
+              <div
+                v-for="(item, index) in formData[key]"
+                :key="index"
+                class="flex gap-2"
+              >
+                <input
+                  type="text"
+                  v-model="formData[key][index]"
+                  placeholder="https://example.com/image.png"
+                  class="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                <button
+                  v-if="formData[key].length > 1"
+                  type="button"
+                  @click="formData[key].splice(index, 1)"
+                  class="p-2 text-destructive hover:bg-destructive/10 rounded-md"
+                  title="Xóa ảnh này"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+
+              <button
+                type="button"
+                @click="formData[key].push('')"
+                class="text-xs flex items-center text-primary hover:underline mt-1"
+              >
+                <PlusCircle class="w-3 h-3 mr-1" /> Thêm ảnh khác
+              </button>
             </div>
 
             <div

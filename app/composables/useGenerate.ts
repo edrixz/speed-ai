@@ -37,7 +37,6 @@ export const useGenerate = () => {
       model.api_schema?.api_schemas?.[0]?.request_schema?.properties || {};
     const initialData: Record<string, any> = {};
 
-    // Duyệt qua từng tham số để lấy giá trị default
     for (const [key, config] of Object.entries(schema)) {
       if (config.default !== undefined) {
         initialData[key] = config.default;
@@ -45,6 +44,9 @@ export const useGenerate = () => {
         initialData[key] = 0;
       } else if (config.type === "boolean") {
         initialData[key] = false;
+      } else if (config.type === "array") {
+        // 👇 UPDATE: Nếu là array (ví dụ: images), khởi tạo mảng có 1 phần tử rỗng để hiện input
+        initialData[key] = [""];
       } else {
         initialData[key] = "";
       }
