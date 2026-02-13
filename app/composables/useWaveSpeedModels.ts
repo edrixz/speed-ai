@@ -8,7 +8,7 @@ export const useWaveSpeedModels = () => {
 
   // 2. DATA: Fetch từ API
   // Lưu ý: useFetch trong composable nên dùng key để tránh conflict nếu gọi nhiều nơi
-  const { data, status, error, refresh } = useFetch<
+  const { data, status, error, refresh, execute } = useFetch<
     WaveSpeedResponse<WaveSpeedModel[]>
   >("/api/wavespeed/models", {
     key: "wavespeed-models",
@@ -56,10 +56,7 @@ export const useWaveSpeedModels = () => {
   };
 
   const handleSelectModel = (model: WaveSpeedModel) => {
-    console.log("Selected Model:", model);
-    // Logic điều hướng sẽ nằm ở đây sau này
-    // navigateTo(...)
-    alert(`Đã chọn: ${model.name}`);
+    return navigateTo(`/generate/${encodeURIComponent(model.model_id)}`);
   };
 
   // 5. RETURN: Chỉ trả về những gì UI cần dùng
@@ -76,6 +73,7 @@ export const useWaveSpeedModels = () => {
 
     // Actions
     refresh: handleRefresh,
+    execute,
     selectModel: handleSelectModel,
   };
 };

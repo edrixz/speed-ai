@@ -9,8 +9,11 @@ const {
   searchQuery,
   selectedType,
   refresh,
+  execute,
   selectModel,
 } = useWaveSpeedModels();
+
+execute();
 </script>
 
 <template>
