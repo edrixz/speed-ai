@@ -60,102 +60,109 @@ const schemaProperties = computed(() => {
             :key="key"
             class="space-y-1.5"
           >
-            <label
-              class="text-sm font-medium flex items-center justify-between"
+            <div
+              v-if="key !== 'enable_safety_checker'"
+              class="space-y-1.5 mb-4"
             >
-              {{ key }}
-              <span v-if="config.required" class="text-red-500 ml-1">*</span>
-            </label>
-
-            <div v-if="config.enum">
-              <select
-                v-model="formData[key]"
-                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              <label
+                class="text-sm font-medium flex items-center justify-between"
               >
-                <option v-for="opt in config.enum" :key="opt" :value="opt">
-                  {{ opt }}
-                </option>
-              </select>
-            </div>
+                {{ key }}
+                <span v-if="config.required" class="text-red-500 ml-1">*</span>
+              </label>
 
-            <div v-else-if="config.type === 'array'" class="space-y-2">
-              <div
-                v-for="(item, index) in formData[key]"
-                :key="index"
-                class="flex gap-2"
-              >
-                <input
-                  type="text"
-                  v-model="formData[key][index]"
-                  placeholder="https://example.com/image.png"
-                  class="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-                <button
-                  v-if="formData[key].length > 1"
-                  type="button"
-                  @click="formData[key].splice(index, 1)"
-                  class="p-2 text-destructive hover:bg-destructive/10 rounded-md"
-                  title="Xóa ảnh này"
+              <div v-if="config.enum">
+                <select
+                  v-model="formData[key]"
+                  class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <Trash2 class="w-4 h-4" />
+                  <option v-for="opt in config.enum" :key="opt" :value="opt">
+                    {{ opt }}
+                  </option>
+                </select>
+              </div>
+
+              <div v-else-if="config.type === 'array'" class="space-y-2">
+                <div
+                  v-for="(item, index) in formData[key]"
+                  :key="index"
+                  class="flex gap-2"
+                >
+                  <input
+                    type="text"
+                    v-model="formData[key][index]"
+                    placeholder="https://example.com/image.png"
+                    class="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                  <button
+                    v-if="formData[key].length > 1"
+                    type="button"
+                    @click="formData[key].splice(index, 1)"
+                    class="p-2 text-destructive hover:bg-destructive/10 rounded-md"
+                    title="Xóa ảnh này"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  @click="formData[key].push('')"
+                  class="text-xs flex items-center text-primary hover:underline mt-1"
+                >
+                  <PlusCircle class="w-3 h-3 mr-1" /> Thêm ảnh khác
                 </button>
               </div>
 
-              <button
-                type="button"
-                @click="formData[key].push('')"
-                class="text-xs flex items-center text-primary hover:underline mt-1"
+              <div
+                v-else-if="config.type === 'boolean'"
+                class="flex items-center space-x-2"
               >
-                <PlusCircle class="w-3 h-3 mr-1" /> Thêm ảnh khác
-              </button>
-            </div>
+                <input
+                  type="checkbox"
+                  v-model="formData[key]"
+                  class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <span class="text-sm text-muted-foreground">Bật/Tắt</span>
+              </div>
 
-            <div
-              v-else-if="config.type === 'boolean'"
-              class="flex items-center space-x-2"
-            >
-              <input
-                type="checkbox"
-                v-model="formData[key]"
-                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <span class="text-sm text-muted-foreground">Bật/Tắt</span>
-            </div>
+              <div
+                v-else-if="
+                  config.type === 'integer' || config.type === 'number'
+                "
+              >
+                <input
+                  type="number"
+                  v-model.number="formData[key]"
+                  :min="config.minimum"
+                  :max="config.maximum"
+                  class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
 
-            <div
-              v-else-if="config.type === 'integer' || config.type === 'number'"
-            >
-              <input
-                type="number"
-                v-model.number="formData[key]"
-                :min="config.minimum"
-                :max="config.maximum"
-                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-            </div>
+              <div v-else-if="key.includes('prompt')">
+                <textarea
+                  v-model="formData[key]"
+                  rows="3"
+                  class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                ></textarea>
+              </div>
 
-            <div v-else-if="key.includes('prompt')">
-              <textarea
-                v-model="formData[key]"
-                rows="3"
-                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-              ></textarea>
-            </div>
+              <div v-else>
+                <input
+                  type="text"
+                  v-model="formData[key]"
+                  class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
 
-            <div v-else>
-              <input
-                type="text"
-                v-model="formData[key]"
-                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
+              <p
+                v-if="config.description"
+                class="text-[10px] text-muted-foreground"
+              >
+                {{ config.description }}
+              </p>
             </div>
-
-            <p
-              v-if="config.description"
-              class="text-[10px] text-muted-foreground"
-            >
-              {{ config.description }}
-            </p>
           </div>
 
           <button

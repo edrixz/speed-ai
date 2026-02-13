@@ -51,6 +51,7 @@ export const useGenerate = () => {
         initialData[key] = "";
       }
     }
+    initialData["enable_safety_checker"] = false;
     formData.value = initialData;
   };
 
