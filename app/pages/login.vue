@@ -56,19 +56,8 @@ const handleLogin = async () => {
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-4">
-        <UiInput
-          v-model="form.email"
-          label="Email"
-          type="email"
-          placeholder="admin@wavespeed.ai"
-        />
-
-        <UiInput
-          v-model="form.password"
-          label="Mật khẩu"
-          type="password"
-          placeholder="••••••••"
-        />
+        <UiInput v-model="form.email" label="Email" type="email" />
+        <UiInput v-model="form.password" label="Mật khẩu" type="password" />
 
         <div
           v-if="errorMsg"
@@ -81,6 +70,16 @@ const handleLogin = async () => {
           Đăng nhập
         </UiButton>
       </form>
+
+      <div class="text-center text-sm">
+        <span class="text-slate-500">Chưa có tài khoản? </span>
+        <NuxtLink
+          to="/register"
+          class="font-medium text-indigo-600 hover:text-indigo-500"
+        >
+          Đăng ký miễn phí
+        </NuxtLink>
+      </div>
     </div>
   </div>
 </template>
