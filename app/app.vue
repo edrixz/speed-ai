@@ -6,19 +6,18 @@ useHead({
   meta: [
     {
       name: "viewport",
-      content: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+      content:
+        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
     },
   ],
 });
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-background text-foreground transition-colors duration-300"
-  >
-    <NuxtLoadingIndicator color="#4f46e5" :height="3" />
+  <UApp>
+    <NuxtLoadingIndicator color="#3b82f6" />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-  </div>
+  </UApp>
 </template>

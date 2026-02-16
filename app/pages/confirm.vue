@@ -6,11 +6,10 @@ definePageMeta({
 const user = useSupabaseUser();
 const router = useRouter();
 
-// Theo dõi user, nếu đã có session thì đá về trang chủ
 watch(
   user,
-  () => {
-    if (user.value) {
+  (newUser) => {
+    if (newUser) {
       router.push("/");
     }
   },
@@ -19,12 +18,20 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center">
-    <div class="text-center">
-      <div
-        class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"
-      ></div>
-      <p class="text-slate-500">Đang xác thực...</p>
-    </div>
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <UCard class="w-full max-w-sm py-10">
+      <div class="text-center space-y-4">
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-12 h-12 text-primary animate-spin mx-auto"
+        />
+        <div>
+          <h3 class="font-medium text-lg">Đang xác thực...</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Vui lòng đợi trong giây lát
+          </p>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

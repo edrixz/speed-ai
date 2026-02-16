@@ -1,93 +1,90 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: "auth",
-});
+definePageMeta({ layout: "auth" });
 
 const client = useSupabaseClient();
-const user = useSupabaseUser(); // 👇 Lấy user state
+const user = useSupabaseUser();
+const toast = useToast();
 
-const form = reactive({
-  email: "",
-  password: "",
-});
+const state = reactive({ email: "", password: "" });
 const loading = ref(false);
-const errorMsg = ref("");
 
 const handleLogin = async () => {
-  if (!form.email || !form.password) {
-    errorMsg.value = "Vui lòng nhập đầy đủ thông tin";
-    return;
-  }
-
+  if (!state.email || !state.password) return;
   loading.value = true;
-  errorMsg.value = "";
 
-  try {
-    const { error } = await client.auth.signInWithPassword({
-      email: form.email,
-      password: form.password,
+  const { error } = await client.auth.signInWithPassword({
+    email: state.email,
+    password: state.password,
+  });
+
+  loading.value = false;
+
+  if (error) {
+    toast.add({
+      title: "Lỗi",
+      description: error.message,
+      color: "error",
+      icon: "i-heroicons-exclamation-circle",
     });
-
-    if (error) throw error;
-
-    // 👇 LOGIC FIX: Theo dõi user state
-    // Ngay khi user có dữ liệu -> Chuyển trang ngay lập tức
-    const unwatch = watch(
-      user,
-      async (newUser) => {
-        if (newUser) {
-          unwatch(); // Hủy theo dõi để tránh memory leak
-          await navigateTo("/");
-        }
-      },
-      { immediate: true },
-    );
-  } catch (err: any) {
-    errorMsg.value = err.message || "Đăng nhập thất bại";
-    loading.value = false;
   }
 };
+
+watch(
+  user,
+  (u) => {
+    if (u) navigateTo("/");
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-background px-8">
-    <div class="w-full max-w-sm space-y-6">
-      <div class="text-center space-y-2">
-        <h1 class="text-3xl font-bold tracking-[0.2rem] text-foreground">
-          SPEED AI
-        </h1>
-        <p class="text-sm text-muted-foreground">
-          Nhập thông tin để truy cập hệ thống
-        </p>
-      </div>
+  <div class="flex min-h-screen items-center justify-center p-4">
+    <UCard class="w-full max-w-sm">
+      <template #header>
+        <h1 class="text-xl font-bold text-center">WaveSpeed AI</h1>
+      </template>
 
       <form @submit.prevent="handleLogin" class="space-y-4">
-        <UiInput v-model="form.email" label="Email" type="email" />
-        <div>
-          <UiInput v-model="form.password" label="Password" type="password" />
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Email</label>
+          <UInput
+            v-model="state.email"
+            icon="i-heroicons-envelope"
+            placeholder="admin@example.com"
+            class="w-full"
+          />
         </div>
 
-        <div
-          v-if="errorMsg"
-          class="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive"
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Mật khẩu</label>
+          <UInput
+            v-model="state.password"
+            type="password"
+            icon="i-heroicons-lock-closed"
+            class="w-full"
+          />
+        </div>
+
+        <UButton
+          type="submit"
+          block
+          :loading="loading"
+          color="primary"
+          size="lg"
         >
-          {{ errorMsg }}
-        </div>
-
-        <UiButton type="submit" :loading="loading" class="w-full">
           Đăng nhập
-        </UiButton>
+        </UButton>
       </form>
 
-      <div class="text-center text-sm">
-        <span class="text-muted-foreground">Chưa có tài khoản? </span>
-        <NuxtLink
-          to="/register"
-          class="font-medium text-primary hover:text-primary/90"
-        >
-          Đăng ký miễn phí
-        </NuxtLink>
-      </div>
-    </div>
+      <template #footer>
+        <div class="text-center text-sm text-gray-500">
+          Chưa có tài khoản?
+          <NuxtLink to="/register" class="text-primary hover:underline"
+            >Đăng ký</NuxtLink
+          >
+        </div>
+      </template>
+    </UCard>
   </div>
 </template>

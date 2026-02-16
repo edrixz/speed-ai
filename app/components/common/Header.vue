@@ -1,71 +1,81 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { LogOut } from 'lucide-vue-next';
+import type { DropdownItem } from "~/types/ui";
 
-const user = useSupabaseUser();
 const client = useSupabaseClient();
+const user = useSupabaseUser();
 const router = useRouter();
 
-const userEmail = ref('');
-const userInitial = ref('');
-const isDropdownOpen = ref(false);
-
-onMounted(() => {
-  if (user.value) {
-    userEmail.value = user.value.email || '';
-    userInitial.value = userEmail.value.charAt(0).toUpperCase();
-  }
-});
-
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
-
-const handleSignOut = async () => {
-  await client.auth.signOut();
-  router.push('/login');
-};
+// 1. Khai báo type rõ ràng cho items: Mảng 2 chiều của DropdownItem
+const items = computed<DropdownItem[][]>(() => [
+  [
+    {
+      label: user.value?.email || "",
+      slot: "account",
+      disabled: true,
+    },
+  ],
+  [
+    {
+      label: "Đăng xuất",
+      icon: "i-heroicons-arrow-right-start-on-rectangle",
+      onSelect: async () => {
+        await client.auth.signOut();
+        router.push("/login");
+      },
+    },
+  ],
+]);
 </script>
 
 <template>
-  <header class="bg-card border-b border-border shadow-sm sticky top-0 z-50">
-    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <header
+    class="bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50"
+  >
+    <UContainer>
       <div class="flex justify-between items-center h-16">
-        <NuxtLink to="/" class="text-2xl font-bold text-primary">
+        <NuxtLink
+          to="/"
+          class="flex items-center gap-2 font-bold text-xl text-primary"
+        >
+          <UIcon name="i-heroicons-bolt" class="w-6 h-6" />
           SPEED AI
         </NuxtLink>
 
-        <div class="flex gap-2">
+        <div class="flex items-center gap-2">
           <ThemeToggle />
 
-          <div class="relative">
-          <button @click="toggleDropdown" class="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary font-bold text-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-            {{ userInitial }}
-          </button>
-
-          <transition
-            enter-active-class="transition ease-out duration-200"
-            enter-from-class="transform opacity-0 scale-95"
-            enter-to-class="transform opacity-100 scale-100"
-            leave-active-class="transition ease-in duration-75"
-            leave-from-class="transform opacity-100 scale-100"
-            leave-to-class="transform opacity-0 scale-95"
+          <UDropdownMenu
+            :items="items"
+            :content="{ align: 'end', side: 'bottom' }"
           >
-            <div v-if="isDropdownOpen" class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card ring-1 ring-border focus:outline-none">
-              <div class="py-1">
-                <div class="px-4 py-2 border-b border-border">
-                  <p class="text-sm text-foreground font-medium truncate">{{ userEmail }}</p>
-                </div>
-                <button @click="handleSignOut" class="w-full text-left flex items-center px-4 py-2 text-sm text-foreground hover:bg-secondary/80 transition-colors">
-                  <LogOut class="mr-2 h-4 w-4" />
-                  <span>Sign Out</span>
-                </button>
+            <UAvatar
+              :alt="user?.email?.charAt(0).toUpperCase()"
+              size="sm"
+              class="bg-primary-50 dark:bg-primary-950 text-primary cursor-pointer ring-2 ring-transparent hover:ring-primary-500 transition-all"
+            />
+
+            <template #account="{ item }: { item: DropdownItem }">
+              <div class="text-left w-full min-w-37.5">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Đang đăng nhập
+                </p>
+                <p class="font-medium text-gray-900 dark:text-white truncate">
+                  {{ item.label }}
+                </p>
               </div>
-            </div>
-          </transition>
-        </div>
+            </template>
+
+            <template #item="{ item }: { item: DropdownItem }">
+              <span class="truncate">{{ item.label }}</span>
+              <UIcon
+                v-if="item.icon"
+                :name="item.icon"
+                class="shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
+              />
+            </template>
+          </UDropdownMenu>
         </div>
       </div>
-    </div>
+    </UContainer>
   </header>
 </template>

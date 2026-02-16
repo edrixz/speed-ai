@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxt/ui": "^4.4.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/supabase": "^2.0.3",
     "@nuxtjs/tailwindcss": "^6.14.0",
@@ -20,10 +21,13 @@
     "lucide-vue-next": "^0.563.0",
     "nuxt": "^4.3.1",
     "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^4.1.18",
     "vue": "^3.5.28",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.3",
+    "@iconify-json/lucide": "^1.2.90",
     "@nuxtjs/google-fonts": "^3.2.0"
   }
 }

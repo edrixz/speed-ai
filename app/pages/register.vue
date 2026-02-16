@@ -1,13 +1,13 @@
 <script setup lang="ts">
-// Set auth layout
+import type { AuthError } from "@supabase/supabase-js";
+
 definePageMeta({
   layout: "auth",
 });
 
 const client = useSupabaseClient();
-const router = useRouter();
+const toast = useToast();
 
-// Form state
 const form = reactive({
   email: "",
   password: "",
@@ -15,39 +15,56 @@ const form = reactive({
 });
 
 const loading = ref(false);
-const errorMsg = ref("");
-const successMsg = ref("");
 
 const handleRegister = async () => {
   if (!form.email || !form.password || !form.confirmPassword) {
-    errorMsg.value = "Vui lòng nhập đầy đủ thông tin.";
+    toast.add({
+      title: "Lỗi",
+      description: "Vui lòng nhập đầy đủ thông tin.",
+      color: "error",
+    });
     return;
   }
   if (form.password !== form.confirmPassword) {
-    errorMsg.value = "Mật khẩu xác nhận không khớp.";
+    toast.add({
+      title: "Lỗi",
+      description: "Mật khẩu xác nhận không khớp.",
+      color: "error",
+    });
     return;
   }
 
   loading.value = true;
-  errorMsg.value = "";
-  successMsg.value = "";
 
   try {
     const { error } = await client.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
-        // Redirect về trang confirm sau khi click link trong email
         emailRedirectTo: `${window.location.origin}/confirm`,
       },
     });
 
-    if (error) throw error;
+    if (error) throw error; // Supabase trả về AuthError
 
-    successMsg.value =
-      "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.";
-    } catch (error: any) {
-    errorMsg.value = error.message || "Đăng ký thất bại.";
+    toast.add({
+      title: "Thành công",
+      description: "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.",
+      color: "success",
+      icon: "i-heroicons-check-circle",
+    });
+  } catch (error: unknown) {
+    // Xử lý type safe cho error
+    let message = "Đăng ký thất bại";
+
+    // Kiểm tra nếu là AuthError của Supabase
+    if (error && typeof error === "object" && "message" in error) {
+      message = (error as AuthError).message;
+    } else if (error instanceof Error) {
+      message = error.message;
+    }
+
+    toast.add({ title: "Lỗi", description: message, color: "error" });
   } finally {
     loading.value = false;
   }
@@ -55,66 +72,71 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-background px-4">
-    <div class="w-full max-w-sm space-y-8">
-      <!-- Header -->
-      <div class="text-center space-y-2">
-        <h1 class="text-3xl font-bold tracking-tight text-foreground">
-          Đăng ký tài khoản
-        </h1>
-        <p class="text-sm text-muted-foreground">
-          Tạo tài khoản mới để sử dụng SPEED AI
-        </p>
-      </div>
+  <div class="flex min-h-screen items-center justify-center p-4">
+    <UCard class="w-full max-w-sm">
+      <template #header>
+        <div class="text-center">
+          <h1 class="text-xl font-bold">Đăng ký tài khoản</h1>
+          <p class="text-sm text-gray-500 mt-1">Tạo tài khoản Speed AI mới</p>
+        </div>
+      </template>
 
-      <!-- Registration Form -->
       <form @submit.prevent="handleRegister" class="space-y-4">
-        <UiInput
-          v-model="form.email"
-          label="Email"
-          type="email"
-          placeholder="Nhập email của bạn"
-        />
-        <UiInput
-          v-model="form.password"
-          label="Mật khẩu"
-          type="password"
-          placeholder="••••••••"
-        />
-        <UiInput
-          v-model="form.confirmPassword"
-          label="Xác nhận mật khẩu"
-          type="password"
-          placeholder="••••••••"
-        />
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Email</label>
+          <UInput
+            v-model="form.email"
+            type="email"
+            icon="i-heroicons-envelope"
+            placeholder="name@example.com"
+            class="w-full"
+          />
+        </div>
 
-        <!-- Error and Success Messages -->
-        <div
-          v-if="errorMsg"
-          class="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive"
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Mật khẩu</label>
+          <UInput
+            v-model="form.password"
+            type="password"
+            icon="i-heroicons-lock-closed"
+            placeholder="••••••••"
+            class="w-full"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-sm font-medium">Xác nhận mật khẩu</label>
+          <UInput
+            v-model="form.confirmPassword"
+            type="password"
+            icon="i-heroicons-lock-closed"
+            placeholder="••••••••"
+            class="w-full"
+          />
+        </div>
+
+        <UButton
+          type="submit"
+          block
+          :loading="loading"
+          color="primary"
+          size="lg"
         >
-          {{ errorMsg }}
-        </div>
-        <div v-if="successMsg" class="p-3 rounded-md bg-green-900 border-green-800 text-sm text-green-400">
-          {{ successMsg }}
-        </div>
-
-        <!-- Submit Button -->
-        <UiButton type="submit" :loading="loading" class="w-full">
           Đăng ký
-        </UiButton>
+        </UButton>
       </form>
 
-      <!-- Login Link -->
-      <div class="text-center text-sm">
-        <span class="text-muted-foreground">Đã có tài khoản? </span>
-        <NuxtLink
-          to="/login"
-          class="font-medium text-primary hover:text-primary/90"
-        >
-        Đăng nhập ngay
-        </NuxtLink>
-      </div>
-    </div>
+      <template #footer>
+        <div class="text-center text-sm text-gray-500">
+          Đã có tài khoản?
+          <NuxtLink
+            to="/login"
+            class="text-primary hover:underline font-medium"
+          >
+            Đăng nhập ngay
+          </NuxtLink>
+        </div>
+      </template>
+    </UCard>
   </div>
 </template>
