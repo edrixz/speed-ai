@@ -42,15 +42,15 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+  <div class="flex min-h-screen items-center justify-center bg-background px-4">
     <div
-      class="w-full max-w-sm space-y-6 bg-white p-8 rounded-xl shadow-lg border border-slate-100"
+      class="w-full max-w-sm space-y-6 bg-card p-8 rounded-xl shadow-lg border"
     >
       <div class="text-center space-y-2">
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+        <h1 class="text-2xl font-bold tracking-tight text-foreground">
           SPEED AI
         </h1>
-        <p class="text-sm text-slate-500">
+        <p class="text-sm text-muted-foreground">
           Nhập thông tin để truy cập hệ thống
         </p>
       </div>
@@ -72,10 +72,10 @@ const handleLogin = async () => {
       </form>
 
       <div class="text-center text-sm">
-        <span class="text-slate-500">Chưa có tài khoản? </span>
+        <span class="text-muted-foreground">Chưa có tài khoản? </span>
         <NuxtLink
           to="/register"
-          class="font-medium text-indigo-600 hover:text-indigo-500"
+          class="font-medium text-primary hover:text-primary/90"
         >
           Đăng ký miễn phí
         </NuxtLink>

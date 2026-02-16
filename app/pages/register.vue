@@ -52,15 +52,15 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+  <div class="flex min-h-screen items-center justify-center bg-background px-4">
     <div
-      class="w-full max-w-sm space-y-6 bg-white p-8 rounded-xl shadow-lg border border-slate-100"
+      class="w-full max-w-sm space-y-6 bg-card p-8 rounded-xl shadow-lg border"
     >
       <div class="text-center space-y-2">
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+        <h1 class="text-2xl font-bold tracking-tight text-foreground">
           Đăng ký tài khoản
         </h1>
-        <p class="text-sm text-slate-500">
+        <p class="text-sm text-muted-foreground">
           Tạo tài khoản mới để sử dụng SPEED AI
         </p>
       </div>
@@ -87,13 +87,13 @@ const handleRegister = async () => {
 
         <div
           v-if="errorMsg"
-          class="p-3 rounded-md bg-red-50 border border-red-100 text-sm text-red-600"
+          class="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive"
         >
           {{ errorMsg }}
         </div>
         <div
           v-if="successMsg"
-          class="p-3 rounded-md bg-green-50 border border-green-100 text-sm text-green-600"
+          class="p-3 rounded-md bg-primary/10 border border-primary/20 text-sm text-primary"
         >
           {{ successMsg }}
         </div>
@@ -104,10 +104,10 @@ const handleRegister = async () => {
       </form>
 
       <div class="text-center text-sm">
-        <span class="text-slate-500">Đã có tài khoản? </span>
+        <span class="text-muted-foreground">Đã có tài khoản? </span>
         <NuxtLink
           to="/login"
-          class="font-medium text-indigo-600 hover:text-indigo-500"
+          class="font-medium text-primary hover:text-primary/90"
         >
           Đăng nhập ngay
         </NuxtLink>

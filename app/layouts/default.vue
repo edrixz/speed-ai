@@ -15,7 +15,7 @@
             W
           </div>
           <span
-            class="bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent"
+            class="bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent"
           >
             SPEED AI
           </span>
