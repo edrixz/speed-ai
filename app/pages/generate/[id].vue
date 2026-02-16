@@ -61,6 +61,16 @@ const schemaProperties = computed(() => {
                   autoresize
                 />
 
+                <div
+                  v-else-if="
+                    config.type === 'array' &&
+                    (key.includes('image') || key === 'init_images')
+                  "
+                  class="space-y-2"
+                >
+                  <ImageArrayInput v-model="formData[key]" />
+                </div>
+
                 <div v-else-if="config.type === 'array'" class="space-y-2">
                   <div
                     v-for="(item, idx) in formData[key]"
@@ -70,7 +80,7 @@ const schemaProperties = computed(() => {
                     <UInput
                       v-model="formData[key][idx]"
                       class="w-full"
-                      placeholder="URL ảnh..."
+                      placeholder="Nhập giá trị..."
                     />
                     <UButton
                       v-if="formData[key].length > 1"
@@ -83,8 +93,9 @@ const schemaProperties = computed(() => {
                   <UButton
                     size="xs"
                     variant="soft"
+                    icon="i-heroicons-plus"
                     @click="formData[key].push('')"
-                    >Thêm ảnh</UButton
+                    >Thêm dòng</UButton
                   >
                 </div>
 
