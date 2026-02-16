@@ -1,9 +1,11 @@
 // app/composables/useGenerate.ts
+import { useWaveSpeedStore } from "~/stores/wavespeed";
 import type { WaveSpeedModel } from "~/types/wavespeed";
 
 export const useGenerate = () => {
   const route = useRoute();
   const router = useRouter();
+  const store = useWaveSpeedStore();
 
   // 1. State
   const currentModel = ref<WaveSpeedModel | null>(null);
@@ -16,17 +18,21 @@ export const useGenerate = () => {
   const { models } = useWaveSpeedModels();
 
   // 3. Khởi tạo dữ liệu khi vào trang
-  const initModel = () => {
+  const initModel = async () => {
     const modelId = decodeURIComponent(route.params.id as string);
 
-    // Tìm model trong danh sách đã tải
-    const found = models.value.find((m) => m.model_id === modelId);
+    // Đảm bảo store đã có data (phòng trường hợp user reload ngay tại trang generate)
+    if (store.models.length === 0) {
+      await store.fetchModels();
+    }
+
+    // Tìm model trong Store
+    const found = store.models.find((m) => m.model_id === modelId);
 
     if (found) {
       currentModel.value = found;
       initializeForm(found);
     } else {
-      // Nếu chưa có data (reload trang), redirect về home hoặc fetch lại (ở đây chọn về home cho đơn giản)
       router.push("/");
     }
   };

@@ -1,19 +1,27 @@
 <script setup lang="ts">
-import { Search, Loader2, Cpu, Sparkles, Filter } from "lucide-vue-next";
+import {
+  Search,
+  Loader2,
+  Cpu,
+  Sparkles,
+  Filter,
+  RefreshCw,
+} from "lucide-vue-next";
 
 const {
   models,
   availableTypes,
-  status,
+  status: isLoading,
   error,
   searchQuery,
   selectedType,
   refresh,
-  execute,
   selectModel,
 } = useWaveSpeedModels();
 
-execute();
+const handleRefresh = async () => {
+  await refresh();
+};
 </script>
 
 <template>
@@ -32,12 +40,35 @@ execute();
             AI Model Library
           </span>
         </h1>
-        <p class="text-muted-foreground">
-          Khám phá kho model AI từ WaveSpeed API.
-        </p>
+        <div class="flex items-center gap-2">
+          <p class="text-muted-foreground">
+            Khám phá kho model AI từ WaveSpeed API.
+          </p>
+
+          <span
+            v-if="isLoading && models.length > 0"
+            class="flex items-center text-xs text-primary animate-pulse"
+          >
+            <RefreshCw class="w-3 h-3 mr-1 animate-spin" /> Đang cập nhật...
+          </span>
+        </div>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        <button
+          @click="handleRefresh"
+          :disabled="isLoading"
+          class="h-10 px-3 rounded-md border border-input bg-background hover:bg-accent flex items-center justify-center transition-colors disabled:opacity-50"
+          title="Cập nhật dữ liệu mới nhất"
+        >
+          <RefreshCw
+            :class="[
+              'w-4 h-4',
+              isLoading ? 'animate-spin text-primary' : 'text-muted-foreground',
+            ]"
+          />
+        </button>
+
         <div class="relative flex-1 md:w-64">
           <Search
             class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
@@ -67,7 +98,7 @@ execute();
     </div>
 
     <div
-      v-if="status === 'pending'"
+      v-if="isLoading && models.length === 0"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
     >
       <div
@@ -78,14 +109,14 @@ execute();
     </div>
 
     <div
-      v-else-if="status === 'error'"
+      v-else-if="error && models.length === 0"
       class="flex flex-col items-center justify-center py-12 text-destructive bg-destructive/5 rounded-xl border border-destructive/20"
     >
       <Loader2 class="w-8 h-8 animate-spin mb-4" />
       <p class="font-medium">Lỗi kết nối WaveSpeed API</p>
-      <p class="text-sm opacity-80 mb-4">{{ error?.message }}</p>
+      <p class="text-sm opacity-80 mb-4">{{ error }}</p>
       <button
-        @click="refresh"
+        @click="handleRefresh"
         class="px-4 py-2 bg-background border border-border rounded-md hover:bg-accent text-sm cursor-pointer"
       >
         Thử lại

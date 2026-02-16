@@ -1,36 +1,30 @@
 // app/composables/useWaveSpeedModels.ts
-import type { WaveSpeedResponse, WaveSpeedModel } from "~/types/wavespeed";
+import { useWaveSpeedStore } from "~/stores/wavespeed";
+import type { WaveSpeedModel } from "~/types/wavespeed";
 
 export const useWaveSpeedModels = () => {
-  // 1. STATE: Quản lý bộ lọc
+  // Kết nối Store
+  const store = useWaveSpeedStore();
+
+  // State Local (chỉ dùng cho UI lọc)
   const searchQuery = ref("");
   const selectedType = ref<string>("all");
 
-  // 2. DATA: Fetch từ API
-  // Lưu ý: useFetch trong composable nên dùng key để tránh conflict nếu gọi nhiều nơi
-  const { data, status, error, refresh, execute } = useFetch<
-    WaveSpeedResponse<WaveSpeedModel[]>
-  >("/api/wavespeed/models", {
-    key: "wavespeed-models",
-    lazy: true,
-    server: false,
-  });
+  // 1. INIT: Gọi store fetch khi component mount
+  // Store sẽ tự quyết định có fetch thật hay không (dựa vào data length)
+  store.fetchModels();
 
-  // 3. COMPUTED: Xử lý dữ liệu thô thành dữ liệu hiển thị
-
-  // Lọc danh sách model dựa trên search và type
+  // 2. COMPUTED: Lọc data từ STORE
   const filteredModels = computed(() => {
-    const models = data.value?.data || [];
+    const models = store.models || [];
     if (!Array.isArray(models)) return [];
 
     return models.filter((model) => {
       const searchLower = searchQuery.value.toLowerCase();
-      // Tìm theo tên hoặc ID
       const nameMatch =
         model.name?.toLowerCase().includes(searchLower) ||
         model.model_id?.toLowerCase().includes(searchLower);
 
-      // Tìm theo loại
       const typeMatch =
         selectedType.value === "all" || model.type === selectedType.value;
 
@@ -38,9 +32,9 @@ export const useWaveSpeedModels = () => {
     });
   });
 
-  // Trích xuất danh sách các loại (Categories) để hiển thị dropdown
+  // Lấy danh sách loại (Types) từ Store
   const availableTypes = computed(() => {
-    const models = data.value?.data || [];
+    const models = store.models || [];
     const types = new Set<string>(["all"]);
     models.forEach((m) => {
       if (m.type) types.add(m.type);
@@ -48,32 +42,31 @@ export const useWaveSpeedModels = () => {
     return Array.from(types).sort();
   });
 
-  // 4. ACTIONS: Các hàm xử lý sự kiện
-
-  // Wrapper cho hàm refresh để tránh lỗi Type Event ở Vue template
+  // 3. ACTIONS
+  // Hàm này dùng cho nút "Refresh" thủ công
   const handleRefresh = async () => {
-    await refresh();
+    await store.fetchModels(true); // true = Force Update
   };
 
   const handleSelectModel = (model: WaveSpeedModel) => {
     return navigateTo(`/generate/${encodeURIComponent(model.model_id)}`);
   };
 
-  // 5. RETURN: Chỉ trả về những gì UI cần dùng
   return {
-    // State (Read-only data hoặc Reactive refs)
+    // Trả về data đã lọc
     models: filteredModels,
     availableTypes,
-    status,
-    error,
 
-    // V-Models (để bind vào input)
+    // Map các state từ store ra ngoài để UI dùng
+    status: computed(() => store.isLoading),
+    error: computed(() => store.error),
+
+    // Local state
     searchQuery,
     selectedType,
 
     // Actions
     refresh: handleRefresh,
-    execute,
     selectModel: handleSelectModel,
   };
 };
