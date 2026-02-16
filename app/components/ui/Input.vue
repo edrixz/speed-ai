@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useVModel } from "@vueuse/core";
+import { cn } from "~/utils/cn";
 
 const props = defineProps<{
   modelValue?: string;
@@ -14,8 +15,8 @@ const value = useVModel(props, "modelValue", emit);
 </script>
 
 <template>
-  <div class="w-full space-y-1">
-    <label v-if="label" class="text-sm font-medium text-slate-700 block">
+  <div class="w-full space-y-2">
+    <label v-if="label" class="text-sm font-medium text-foreground block">
       {{ label }}
     </label>
     <input
@@ -23,13 +24,13 @@ const value = useVModel(props, "modelValue", emit);
       :type="type || 'text'"
       :class="
         cn(
-          'flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all',
-          error && 'border-red-500 focus-visible:ring-red-500',
+          'flex h-12 w-full rounded-lg border-none bg-input px-4 py-2 text-base text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all',
+          error && 'ring-2 ring-destructive ring-offset-2'
         )
       "
       :placeholder="placeholder"
     />
-    <p v-if="error" class="text-xs text-red-500 font-medium animate-pulse">
+    <p v-if="error" class="text-xs text-destructive font-medium animate-pulse">
       {{ error }}
     </p>
   </div>

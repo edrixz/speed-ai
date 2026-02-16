@@ -42,12 +42,12 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-background px-4">
+  <div class="flex min-h-screen items-center justify-center bg-background px-8">
     <div
-      class="w-full max-w-sm space-y-6 bg-card p-8 rounded-xl shadow-lg border"
+      class="w-full max-w-sm space-y-6"
     >
       <div class="text-center space-y-2">
-        <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        <h1 class="text-3xl font-bold tracking-[0.2rem] text-foreground">
           SPEED AI
         </h1>
         <p class="text-sm text-muted-foreground">
@@ -57,11 +57,14 @@ const handleLogin = async () => {
 
       <form @submit.prevent="handleLogin" class="space-y-4">
         <UiInput v-model="form.email" label="Email" type="email" />
-        <UiInput v-model="form.password" label="Mật khẩu" type="password" />
+        <div>
+          <UiInput v-model="form.password" label="Password" type="password" />
+        </div>
+
 
         <div
           v-if="errorMsg"
-          class="p-3 rounded-md bg-red-50 border border-red-100 text-sm text-red-600"
+          class="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive"
         >
           {{ errorMsg }}
         </div>
@@ -77,7 +80,7 @@ const handleLogin = async () => {
           to="/register"
           class="font-medium text-primary hover:text-primary/90"
         >
-          Đăng ký miễn phí
+        Đăng ký miễn phí
         </NuxtLink>
       </div>
     </div>
