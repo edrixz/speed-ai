@@ -11,7 +11,17 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "@nuxtjs/color-mode",
+    "@nuxtjs/google-fonts",
   ],
+  // Cấu hình Google Fonts
+  googleFonts: {
+    families: {
+      Inter: [400, 500, 600, 700, 800],
+    },
+    display: "swap", // Tăng tốc độ hiển thị
+    prefetch: true,
+    preconnect: true,
+  },
   // Cấu hình Color Mode
   colorMode: {
     classSuffix: "", // Tạo class 'dark' thay vì 'dark-mode' khớp với Tailwind
